@@ -1,0 +1,35 @@
+{
+  "name": "vorm-the-formbuilder",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "bootstrap": "^5.2.0",
+    "bootstrap-vue": "^2.22.0",
+    "core-js": "^3.8.3",
+    "material-icons": "^0.3.1",
+    "firebase": "^9.9.2",
+    "vue": "^2.6.14",
+    "vue-json-viewer": "^2.2.22",
+    "vue-router": "^3.5.1",
+    "vue2-datepicker": "^3.11.0",
+    "vue2-timepicker": "^1.1.6",
+    "vuedraggable": "^2.24.3",
+    "vuesax": "^4.0.1-alpha.25",
+    "vuex": "^3.6.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-router": "~5.0.0",
+    "@vue/cli-plugin-vuex": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "node-sass": "^7.0.1",
+    "sass-loader": "^13.0.2",
+    "stylus": "^0.59.0",
+    "stylus-loader": "^7.0.0",
+    "vue-template-compiler": "^2.6.14"
+  }
+}
