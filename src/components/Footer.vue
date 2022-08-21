@@ -1,7 +1,7 @@
 <template>
   <div class="footer">
     <h6>
-      Developed by
+      Designed & Developed by
       <span><a href="https://sohailahmad.netlify.app"> Sohail Ahmad</a></span>
       <i class="fa-brands fa-vuejs"></i>
     </h6>
