@@ -8,11 +8,9 @@
         <span>VORM - The Form Builder</span>
         <i id="hammer" class="fa-solid fa-hammer"></i>
       </div>
-      <!-- TODO: v-model="value" -->
       <vs-input placeholder="Search" />
       <div class="switch">
-        <!-- TODO:  v-model="switchBtn" put it as attr of vs-switch -->
-        <vs-switch />
+        <vs-switch dark />
         <span>Theme</span>
         <button type="button" @click="downloadFile()" class="btn btn-primary">
           Export JSON<font-awesome-icon icon="fa-solid fa-share" />
@@ -27,19 +25,21 @@
               <draggable
                 class="dragArea coulmns"
                 :list="elements"
-                :group="{ name: 'element', pull: 'clone', put: false }"
+                :group="{ name: 'the-elements', pull: 'clone', put: true }"
+                animation="200"
               >
                 <div
                   class="element column is-half"
                   v-for="ele in elements"
-                  :key="ele.label"
+                  :key="ele.type"
                 >
                   <span class="ion" v-html="ele.icon"></span>
-                  <span style="color: grey">{{ ele.type }}</span>
+                  <span style="color: black">{{ ele.type }}</span>
                 </div>
               </draggable>
             </div>
           </vs-col>
+
           <vs-col w="8">
             <div class="row">
               <div>
@@ -49,7 +49,7 @@
                     Add Row
                   </vs-button>
                   <h4
-                    style="color: whitesmoke"
+                    style="color: black"
                     @click="Switch(0)"
                     class="active"
                     id="Form"
@@ -68,23 +68,15 @@
             </div>
             <div class="dash">
               <div v-if="activeTab === 0">
-                <v-row
-                  style="padding: 5px"
-                  v-for="(row, index) in form"
-                  :key="index"
-                >
-                  <div
-                    style="
-                      width: 100%;
-                      border-bottom: 1px solid #e52e71;
-                      border-top: 1px solid #e52e71;
-                    "
-                  >
+                <v-row v-for="(row, index) in form" :key="index">
+                  <div style="width: 100%">
                     <draggable
                       class="activeArea roww"
                       style="width: 100%"
                       :list="row"
-                      :group="'element'"
+                      :group="'the-elements'"
+                      :no-transition-on-drag="true"
+                      animation="200"
                     >
                       <vs-col
                         :size="element.size"
@@ -93,7 +85,48 @@
                         :key="element.row"
                       >
                         <div class="top">
-                          <span>{{ element.type }}</span>
+                          <div class="inner-elements">
+                            <div v-if="element.type === 'Text'">
+                              <span>{{ element.type }}</span>
+                              <vs-input
+                                primary
+                                style="color: #000000"
+                                v-model="nameData"
+                                placeholder="Enter your name"
+                                @change="jsonForm.push(nameData)"
+                                @keyup.enter="handleText"
+                              />
+                            </div>
+                            <div v-if="element.type === 'Email'">
+                              <span>{{ element.type }}</span>
+                              <vs-input
+                                primary
+                                v-model="emailData"
+                                style="color: #000000"
+                                placeholder="Enter your email"
+                                @keyup.enter="handleText"
+                                @change="jsonForm.push(emailData)"
+                              />
+                            </div>
+                            <div v-else-if="element.type === 'Date Picker'">
+                              <span>{{ element.type }}</span>
+                              <datepicker
+                                style="color: grey"
+                                placeholder="Select Date"
+                                v-model="datePicker"
+                              ></datepicker>
+                              <p>{{ datePicker }}</p>
+                            </div>
+                            <div v-else-if="element.type === 'File'">
+                              <span>{{ element.type }}</span>
+                              <br />
+                              <input
+                                type="file"
+                                @change="uploadFile"
+                                ref="file"
+                              />
+                            </div>
+                          </div>
                           <span>
                             <ion-icon
                               style="color: red; cursor: pointer"
@@ -103,9 +136,6 @@
                             </ion-icon>
                           </span>
                         </div>
-                        <div class="label">
-                          {{ element.label }}
-                        </div>
                       </vs-col>
                     </draggable>
                   </div>
@@ -114,13 +144,13 @@
             </div>
           </vs-col>
           <vs-col vs-type="flex" vs-justify="center" vs-align="center" w="2">
-            <h4 style="color: white">
+            <h4>
               Form JSON
               <i class="fa-brands fa-node-js"></i>
             </h4>
             <json-viewer
-              style="text-align: left"
-              :value="form"
+              style="text-align: left; border: 1px solid grey"
+              :value="jsonForm"
               :expand-depth="3"
               theme="jv-light"
             ></json-viewer>
@@ -135,93 +165,53 @@
 import draggable from "vuedraggable";
 import Footer from "@/components/Footer.vue";
 import exportFromJSON from "export-from-json";
+import Datepicker from "vuejs-datepicker/dist/vuejs-datepicker.esm.js";
+import elements from "../assets/data/elements";
 
 export default {
   name: "BuilderView",
   data() {
     return {
+      file: null,
+      emailData: "",
+      nameData: "",
       active: false,
       activeTab: 0,
-      elements: [
-        {
-          type: "Text",
-          size: 0,
-          icon: '<ion-icon name="mail-outline"></ion-icon>',
-        },
-        {
-          type: "Email",
-          size: 0,
-          icon: '<ion-icon name="at-outline"></ion-icon>',
-        },
-        {
-          type: "File",
-          size: 0,
-          icon: '<ion-icon name="document-outline"></ion-icon>',
-        },
-        {
-          type: "Password",
-          size: 0,
-          icon: '<ion-icon name="lock-closed-outline"></ion-icon>',
-        },
-        {
-          type: "Number",
-          size: 0,
-          icon: '<ion-icon name="bar-chart-outline"></ion-icon>',
-        },
-        {
-          type: "Url",
-          size: 0,
-          icon: '<ion-icon name="globe-outline"></ion-icon>',
-        },
-        {
-          type: "File",
-          size: 0,
-          icon: '<ion-icon name="newspaper-outline"></ion-icon>',
-        },
-        {
-          type: "Date Picker",
-          size: 0,
-          icon: '<ion-icon name="calendar-outline"></ion-icon>',
-        },
-        {
-          type: "Time Picker",
-          size: 0,
-          icon: '<ion-icon name="time-outline"></ion-icon>',
-        },
-        {
-          type: "Switch",
-          size: 0,
-          icon: '<ion-icon name="toggle-outline"></ion-icon>',
-        },
-        {
-          type: "Checkbox",
-          size: 0,
-          icon: '<ion-icon name="checkbox-outline"></ion-icon>',
-        },
-        {
-          type: "Options",
-          size: 0,
-          icon: '<ion-icon name="options-outline"></ion-icon>',
-        },
-        {
-          type: "Radio",
-          size: 0,
-          icon: '<ion-icon name="ellipse-outline"></ion-icon>',
-        },
-      ],
       form: [],
+      jsonForm: [],
+      datePicker: null,
+      elements: elements,
     };
   },
   components: {
     draggable,
     Footer,
+    Datepicker,
+    elements,
   },
   mounted() {
     this.$vToastify.success("Form reset successful");
+    this.form.push([]);
   },
   methods: {
+    handleText() {
+      this.nameData = "";
+      this.emailData = "";
+    },
+    uploadFile() {
+      this.Images = this.$refs.file.files[0];
+      const formData = new FormData();
+      formData.append("file", this.Images);
+      const headers = { "Content-Type": "multipart/form-data" };
+      axios
+        .post("https://httpbin.org/post", formData, { headers })
+        .then((res) => {
+          res.data.files; // binary representation of the file
+          res.status; // HTTP status
+        });
+    },
     downloadFile() {
-      const data = this.form;
+      const data = this.jsonForm;
       if (data.length == 0) {
         this.$vToastify.error("Cannot export an empty form");
         return;
@@ -259,7 +249,7 @@ export default {
 }
 
 .builder {
-  background: #1e2023;
+  background: #fff;
 }
 
 #Form:hover {
@@ -280,7 +270,7 @@ section {
 }
 
 nav {
-  padding: 10px;
+  padding: 7px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -300,6 +290,15 @@ nav {
   }
 }
 
+.inner-elements {
+  color: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10px;
+}
+
 .name {
   font-size: 18px;
   left: 0;
@@ -309,7 +308,6 @@ nav {
   font-weight: 700;
 }
 vs-switch {
-  background: #000;
   padding: 10px;
 }
 
@@ -327,7 +325,7 @@ vs-switch {
 
 i {
   padding: 10px;
-  color: aliceblue;
+  color: grey;
 }
 .fa-share {
   right: 0;
@@ -343,7 +341,7 @@ button {
   font-size: 18px;
 }
 .fa-circle-chevron-left:hover {
-  color: #e52e71;
+  color: #fff;
 }
 
 .row {
@@ -368,7 +366,7 @@ button {
 }
 
 .element {
-  background-color: rgb(48, 48, 48);
+  border: 1px solid grey;
   margin: 7px;
   height: 7vw;
   display: flex;
@@ -379,7 +377,7 @@ button {
 
 .element .ion {
   font-size: 32px;
-  color: #ffffff;
+  color: grey;
 }
 
 .icon {

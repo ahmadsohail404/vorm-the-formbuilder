@@ -9,6 +9,7 @@ import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loade
 
 
 Vue.use(VueToastify, {
+
   successDuration: 2000,
   errorDuration: 2000,
   position: "bottom-center",
